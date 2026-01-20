@@ -22,11 +22,12 @@ $mySelf = $MyInvocation.MyCommand.ScriptBlock
 & {
     foreach ($file in Get-ChildItem -filter build.with.*.ps1) {
         $techniqueName = $file.Name -replace '\.build\.with' -replace '\.ps1$'
+        $script = (Get-Command $file.FullName -CommandType ExternalScript).ScriptBlock
         $time = Measure-Command { . $file.FullName } 
         [PSCustomObject]@{
             Technique = $techniqueName
             Time = $time
-            Script = (Get-Command $file.FullName -CommandType ExternalScript).ScriptBlock
+            Script = $script
         }
     }
 } | Tee-Object -Variable buildTimes
@@ -78,7 +79,8 @@ $buildTimes | ConvertTo-Html -Title BuildTimes > ./times.html
     
     "<h3>The Numbers</h3>"
     $buildTimes | 
-        Select-Object Technique, Time, RelativeSpeed | ConvertTo-Html -Fragment
+        Select-Object Technique, Time, RelativeSpeed | 
+        ConvertTo-Html -Fragment
     "<details>"
         "<summary>View Source</summary>"
         "<pre><code class='language-PowerShell'>"
