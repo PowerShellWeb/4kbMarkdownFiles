@@ -4,7 +4,7 @@ param(
 $InputPath = "$psScriptRoot/TestMarkdown",
 
 [string]
-$OutputPath = "$psScriptRoot/PowerShellSlower"
+$OutputPath = "$psScriptRoot/PowerShellConvertFromMarkdown"
 )
 
 
