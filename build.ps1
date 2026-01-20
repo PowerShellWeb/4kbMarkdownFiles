@@ -14,8 +14,27 @@ Push-Location $PSScriptRoot
 if ($env:GITHUB_WORKFLOW) {
     $null = sudo npm install -g '@11ty/eleventy'
 }
-
 #endregion Install Prereqs
+
+#region Get Clock Speed
+$cpuSpeed = 
+    if ($executionContext.SessionState.PSVariable.Get('IsLinux').Value) {
+        Get-Content /proc/cpuinfo -Raw -ErrorAction SilentlyContinue | 
+            Select-String "(?<Unit>Mhz|MIPS)\s+\:\s+(?<Value>[\d\.]+)" | 
+            Select-Object -First 1 -ExpandProperty Matches |
+            ForEach-Object {
+                $_.Groups["Value"].Value -as [int]
+            }
+    } elseif ($executionContext.SessionState.PSVariable.Get('IsMacOS').Value) {
+        (sysctl -n hw.cpufrequency) / 1e6 -as [int]
+    } else {
+        $getCimInstance = $ExecutionContext.SessionState.InvokeCommand.GetCommand('Get-CimInstance','Cmdlet')
+        if ($getCimInstance) {
+            & $getCimInstance -Class Win32_Processor |
+                Select-Object -ExpandProperty MaxClockSpeed
+        }
+    }
+#endregion
 
 $mySelf = $MyInvocation.MyCommand.ScriptBlock
 
@@ -52,15 +71,19 @@ $buildTimes | ConvertTo-Html -Title BuildTimes > ./times.html
     body { height: 100vh; max-width: 100vw; margin:0 } 
     
     svg { height: 5%; }
-    summary { font-size: 2rem; }
+    h1,h2, h3 { text-align: center; }
+    .techniqueSummary { font-size: 2rem; }
 
     "
     "</style>"
     "</head>"
     "<body>"
+    "<h1>4kb Markdown Files Benchmark</h1>"
+    "<h2>Time to build 4096 markdown files</h2>"    
+    "<h3>Last built at $([DateTime]::UtcNow.ToString("s")) running @ $cpuSpeed Mhz</h3>"
     foreach ($buildTime in $buildTimes) {
         "<details open>"
-            "<summary>$($buildTime.Technique) ($([Math]::Round(
+            "<summary class='techniqueSummary'>$($buildTime.Technique) ($([Math]::Round(
                 $buildTime.Time.TotalSeconds, 2
             ))s)</summary>"
             "<details>"
