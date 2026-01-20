@@ -11,7 +11,10 @@ param()
 Push-Location $PSScriptRoot
 
 #region Install Prereqs
-$null = npx @11ty/eleventy --help
+if ($env:GITHUB_WORKFLOW) {
+    $null = sudo npm install -g '@11ty/eleventy'
+}
+
 #endregion Install Prereqs
 
 & {
@@ -45,7 +48,6 @@ $buildTimes | ConvertTo-Html -Title BuildTimes > ./times.html
     body { height: 100vh; max-width: 100vw; margin:0 } 
     
     svg { height: 5%; }
-    
     summary { font-size: 2rem; }
 
     "
