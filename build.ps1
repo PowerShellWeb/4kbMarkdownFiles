@@ -29,7 +29,7 @@ $buildTimes | ConvertTo-Html -Title BuildTimes > ./times.html
     "<title>4kb Markdown Files</title>"
     "</head>"
     "<body>"
-    $buildTimes | ConvertTo-Html -Title BuildTimes -Fragment
+    $buildTimes | ConvertTo-Html -Fragment
     "</body>"
     "</html>"
 ) > ./index.html
