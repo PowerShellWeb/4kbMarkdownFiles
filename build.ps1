@@ -1,6 +1,18 @@
+<#
+.SYNOPSIS
+    Builds 4kb Markdown files
+.DESCRIPTION
+    Builds 4kb Markdown files N different ways, in order to test performance.
+.NOTES
+    In the interests of fair play, any prerequisities should be installed before builds are timed.
+#>
 param()
 
 Push-Location $PSScriptRoot
+
+#region Install Prereqs
+$null = npx @11ty/eleventy --help
+#endregion Install Prereqs
 
 & {
     foreach ($file in Get-ChildItem -filter build.with.*.ps1) {
