@@ -63,8 +63,9 @@ $buildTimes | ConvertTo-Html -Title BuildTimes > ./times.html
 
 @(
     "<html>"
-    "<head>"
+    "<head>"    
     "<title>4kb Markdown Files</title>"
+    "<meta name='viewport' content='width=device-width, initial-scale=1, minimum-scale=1.0' />"
     "<style>"
     "
     
