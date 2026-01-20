@@ -17,6 +17,8 @@ if ($env:GITHUB_WORKFLOW) {
 
 #endregion Install Prereqs
 
+$mySelf = $MyInvocation.MyCommand.ScriptBlock
+
 & {
     foreach ($file in Get-ChildItem -filter build.with.*.ps1) {
         $techniqueName = $file.Name -replace '\.build\.with' -replace '\.ps1$'
@@ -24,6 +26,7 @@ if ($env:GITHUB_WORKFLOW) {
         [PSCustomObject]@{
             Technique = $techniqueName
             Time = $time
+            Script = (Get-Command $file.FullName -CommandType ExternalScript).ScriptBlock
         }
     }
 } | Tee-Object -Variable buildTimes
@@ -59,6 +62,12 @@ $buildTimes | ConvertTo-Html -Title BuildTimes > ./times.html
             "<summary>$($buildTime.Technique) ($([Math]::Round(
                 $buildTime.Time.TotalSeconds, 2
             ))s)</summary>"
+            "<details>"
+            "<summary>Build Script</summary>"
+            "<pre><code class='langauge-PowerShell'>"
+            [Web.HttpUtility]::HtmlEncode($buildTime.Script)
+            "</code></pre>"
+            "</details>"
             "<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%'>"
                 "<rect x='0%' width='1%' height='100%'>"
                     "<animate attributeName='width' from='1%' to='$([Math]::Round($buildTime.relativeSpeed * 100, 2))%' dur='$($buildTime.Time.TotalSeconds)s' fill='freeze' />"
@@ -68,7 +77,14 @@ $buildTimes | ConvertTo-Html -Title BuildTimes > ./times.html
     }
     
     "<h3>The Numbers</h3>"
-    $buildTimes | ConvertTo-Html -Fragment
+    $buildTimes | 
+        Select-Object Technique, Time, RelativeSpeed | ConvertTo-Html -Fragment
+    "<details>"
+        "<summary>View Source</summary>"
+        "<pre><code class='language-PowerShell'>"
+        [Web.HttpUtility]::HtmlEncode("$mySelf")
+        "</code></pre>"
+    "</details>"
     "</body>"
     "</html>"
 ) > ./index.html
