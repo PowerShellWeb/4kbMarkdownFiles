@@ -39,7 +39,17 @@ $buildTimes | ConvertTo-Html -Title BuildTimes > ./times.html
     "<html>"
     "<head>"
     "<title>4kb Markdown Files</title>"
-    "<style>body { height: 100vh; max-width: 100vw; margin:0 } svg { height: 25%; }</style>"
+    "<style>"
+    "
+    
+    body { height: 100vh; max-width: 100vw; margin:0 } 
+    
+    svg { height: 5%; }
+    
+    summary { font-size: 2rem; }
+
+    "
+    "</style>"
     "</head>"
     "<body>"
     foreach ($buildTime in $buildTimes) {
