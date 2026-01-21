@@ -14,7 +14,7 @@ Push-Location $PSScriptRoot
 if ($env:GITHUB_WORKFLOW) {
     $null = sudo npm install -g '@11ty/eleventy'
 
-    Install-Module MarkX 
+    Install-Module MarkX -Force
 
     Import-Module MarkX -Global
 }
