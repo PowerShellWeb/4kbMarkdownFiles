@@ -13,6 +13,8 @@ Push-Location $PSScriptRoot
 #region Install Prereqs
 if ($env:GITHUB_WORKFLOW) {
     $null = sudo npm install -g '@11ty/eleventy'
+
+    Install-Module MarkX 
 }
 #endregion Install Prereqs
 
