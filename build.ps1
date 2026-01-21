@@ -15,6 +15,8 @@ if ($env:GITHUB_WORKFLOW) {
     $null = sudo npm install -g '@11ty/eleventy'
 
     Install-Module MarkX 
+
+    Import-Module MarkX -Global
 }
 #endregion Install Prereqs
 
