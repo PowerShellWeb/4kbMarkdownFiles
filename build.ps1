@@ -113,11 +113,6 @@ $history = @(try {
     Invoke-RestMethod -Uri $BuildTimeHistoryUrl -ErrorAction Ignore
 } catch {}) -ne $null
 
-$history += $buildTimes | 
-    Select-Object Technique, Time, RelativeSpeed, DateTime
-
-ConvertTo-Json -InputObject $history > ./history.json -Depth 2
-
 $buildTimes | ConvertTo-Html -Title BuildTimes > ./times.html
 
 @(
@@ -191,7 +186,7 @@ $history = @(try {
 $history += $buildTimes | 
     Select-Object Technique, Time, RelativeSpeed, DateTime
 
-ConvertTo-Json -InputObject $history > ./history.json -Depth 2
+# ConvertTo-Json -InputObject $history > ./history.json -Depth 2
 
 
 
