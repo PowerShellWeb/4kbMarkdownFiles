@@ -72,14 +72,12 @@ foreach ($buildTime in $buildTimes) {
 
 $history = @(try {
     Invoke-RestMethod -Uri $BuildTimeHistoryUrl -ErrorAction Ignore
-} catch {
-    $null    
-})
+} catch {}) -ne $null
 
 $history += $buildTimes | 
     Select-Object Technique, Time, RelativeSpeed, Date
 
-ConvertTo-Json -InputObject $history > ./history.json
+ConvertTo-Json -InputObject $history > ./history.json -Depth 2
 
 $buildTimes | ConvertTo-Html -Title BuildTimes > ./times.html
 
