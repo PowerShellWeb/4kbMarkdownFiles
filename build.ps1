@@ -158,6 +158,12 @@ $([Web.HttpUtility]::HtmlAttributeEncode($descriptionMessage))
     "<h3>Last built at $([DateTime]::UtcNow.ToString("s")) running @ $cpuSpeed Mhz</h3>"
     "<h4><a href='https://github.com/PowerShellWeb/4kbMarkdownFiles/'><button>Github Repo</button></a></h4>"
     
+    "<h4>"    
+    "[![Deploy](https://github.com/PowerShellWeb/4kbMarkdownFiles/actions/workflows/deploy.yml/badge.svg)](https://github.com/PowerShellWeb/4kbMarkdownFiles/actions/workflows/deploy.yml)" |
+        ConvertFrom-Markdown |
+        Select-Object -ExpandProperty Html
+    "</h4>"
+    
     foreach ($buildTime in $buildTimes) {
         $green = [byte][Math]::Floor(
             (1 - $buildTime.RelativeSpeed) * 255  
