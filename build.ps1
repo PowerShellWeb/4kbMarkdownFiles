@@ -144,15 +144,15 @@ $buildTimes | ConvertTo-Html -Title BuildTimes > ./times.html
     "<h2>Time to build 4096 markdown files</h2>"    
     "<h3>Last built at $([DateTime]::UtcNow.ToString("s")) running @ $cpuSpeed Mhz</h3>"
     "<h4><a href='https://github.com/PowerShellWeb/4kbMarkdownFiles/'><button>Github Repo</button></a></h4>"
-
+    
     foreach ($buildTime in $buildTimes) {
         $green = [Math]::Floor(
             (1 - $buildTime.RelativeSpeed) * 255  
         )
         $red = [Math]::Floor(
-            (1 - $buildTime.RelativeSpeed) * 255  
+            $buildTime.RelativeSpeed * 255  
         )
-        $color = "#{0:x2}{1:x2}00" -f $red, $green
+        $color = "#{0:2x}{1:2x}00" -f $red, $green
 
         "<details open>"
             "<summary class='techniqueSummary'>$($buildTime.Technique) ($([Math]::Round(
