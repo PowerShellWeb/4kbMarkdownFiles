@@ -164,13 +164,27 @@ $([Web.HttpUtility]::HtmlAttributeEncode($descriptionMessage))
         Select-Object -ExpandProperty Html
     "</h4>"
     
+    # Make a really basic heatmap (yes, this is that easy)
+    # We want the fastest item to be the most green, so start by getting its relative speed
+    $fastestRelativeSpeed = $buildTimes[0].RelativeSpeed
     foreach ($buildTime in $buildTimes) {
+        # We only neeed two colors for the heatmap: green and red.
+        # Green is calculated by:
         $green = [byte][Math]::Floor(
-            (1 - $buildTime.RelativeSpeed) * 255  
+            # Starting at one
+            (1 -             
+                # Subtracting the relative speed
+                $buildTime.RelativeSpeed + 
+                # and adding the fastest relative speed.
+                $fastestRelativeSpeed                
+            ) * 255  # (multiply by 255 and floor it to make a byte)
         )
+        # Red is even easier, it's just the relative speed as a byte
         $red = [byte][Math]::Floor(
             $buildTime.RelativeSpeed * 255  
         )
+
+        # Use a bit of C# string formatting to make a color (blue is always blank)
         $color = "#{0:x2}{1:x2}00" -f $red, $green
 
         "<details open>"
