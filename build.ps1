@@ -116,6 +116,11 @@ $history = @(try {
 $buildTimes | ConvertTo-Html -Title BuildTimes > ./times.html
 
 
+$descriptionMessage = foreach ($buildtime in $buildTime) {
+    [Web.HttpUtility]::HtmlAttributeEncode(
+        ($buildTime.Technique, $buildTime.Time -join ':')
+    )
+}
 
 @(
     "<html>"
@@ -125,6 +130,12 @@ $buildTimes | ConvertTo-Html -Title BuildTimes > ./times.html
     "<title>4kb Markdown Files</title>"
     
     "<meta name='viewport' content='width=device-width, initial-scale=1, minimum-scale=1.0' />"
+
+    "<meta name='og:title' content='4kb Markdown Files Benchmark' />"
+    
+    "<meta name='og:description' content='4kb Markdown Files Benchmark.  The fastest framework is no framework.  $descriptionMessage' />"
+
+    "<meta name='article:published_time' content='$($StartTime.ToString('s'))' />"
 
     "<style>"
     
