@@ -115,6 +115,8 @@ $history = @(try {
 
 $buildTimes | ConvertTo-Html -Title BuildTimes > ./times.html
 
+
+
 @(
     "<html>"
     
@@ -142,7 +144,16 @@ $buildTimes | ConvertTo-Html -Title BuildTimes > ./times.html
     "<h2>Time to build 4096 markdown files</h2>"    
     "<h3>Last built at $([DateTime]::UtcNow.ToString("s")) running @ $cpuSpeed Mhz</h3>"
     "<h4><a href='https://github.com/PowerShellWeb/4kbMarkdownFiles/'><button>Github Repo</button></a></h4>"
+
     foreach ($buildTime in $buildTimes) {
+        $green = [Math]::Floor(
+            (1 - $buildTime.RelativeSpeed) * 255  
+        )
+        $red = [Math]::Floor(
+            (1 - $buildTime.RelativeSpeed) * 255  
+        )
+        $color = "#{0:x2}{1:x2}00" -f $red, $green
+
         "<details open>"
             "<summary class='techniqueSummary'>$($buildTime.Technique) ($([Math]::Round(
                 $buildTime.Time.TotalSeconds, 2
@@ -154,8 +165,8 @@ $buildTimes | ConvertTo-Html -Title BuildTimes > ./times.html
             "</code></pre>"
             "</details>"
             "<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%'>"
-                "<rect x='0%' width='1%' height='100%'>"
-                    "<animate attributeName='width' from='1%' to='$([Math]::Round($buildTime.relativeSpeed * 100, 2))%' dur='$($buildTime.Time.TotalSeconds)s' fill='freeze' />"
+                "<rect x='0%' width='1%' height='100%' fill='$color' stroke='currentColor'>"
+                    "<animate attributeName='width' from='1%' to='100%' dur='$($buildTime.Time.TotalSeconds)s' fill='freeze' />"
                 "</rect>"
             "</svg>"
         "</details>"
