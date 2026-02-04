@@ -14,15 +14,54 @@ $BuildTimeHistoryUrl = "https://4kb.powershellweb.com/history.json"
 # Make sure we're in the right place.
 Push-Location $PSScriptRoot
 
+$initStart = [DateTime]::Now
+
 #region Install Prereqs
 if ($env:GITHUB_WORKFLOW) {
     # Install 11ty to reduce 11ty build time
     $null = sudo npm install -g '@11ty/eleventy'    
 
+    #region Astro Initialization
+    # Install Astro to reduce astro build time
+    $null = sudo npm install -g 'astro'
+
+    $astroDevRoot = Join-Path $PSScriptRoot "astrodev"
+    New-Item -ItemType File -Path (
+        Join-Path $astroDevRoot package.json
+    ) -Force -Value (    
+        [Ordered]@{
+            name='astro-test'
+            type='module'
+            version='0.0.1'
+            scripts = [Ordered]@{
+                "build" = "astro build"
+            }
+            dependencies = @{
+                "astro" = 'latest'
+            }
+        } | ConvertTo-Json 
+    )
+
+    Push-Location $astroDevRoot
+
+    npm install | Out-Host
+
+    $pagesRoot = Join-Path $PSScriptRoot "src/pages"
+    if (-not (Test-Path $pagesRoot)) {
+        New-Item -ItemType Directory -Path $pagesRoot
+    }
+
+    Copy-Item ../TestMarkdown/* $pagesRoot  
+
+    Pop-Location
+
+    #endregion Astro Initialization
+
     Install-Module MarkX -Force
 
     Import-Module MarkX -Global
 }
+$initEnd = [DateTime]::Now
 #endregion Install Prereqs
 
 #region Get Clock Speed
