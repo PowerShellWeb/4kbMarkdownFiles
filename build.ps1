@@ -66,6 +66,7 @@ $buildTimes = $buildTimes | Sort-Object Time
 
 foreach ($buildTime in $buildTimes) {
     $relativeSpeed = $buildTime.Time.TotalMilliseconds / $buildTimes[-1].Time.TotalMilliseconds
+    Add-Member NoteProperty -InputObject $buildTime -Name Time "$($buildTime.Time)" -Force
     Add-Member NoteProperty -InputObject $buildTime -Name RelativeSpeed $relativeSpeed -Force
     Add-Member NoteProperty -InputObject $buildTime -Name DateTime $StartTime -Force
 }
@@ -77,7 +78,7 @@ $history = @(try {
 $history += $buildTimes | 
     Select-Object Technique, Time, RelativeSpeed, Date
 
-ConvertTo-Json -InputObject $history > ./history.json -Depth 2
+# ConvertTo-Json -InputObject $history > ./history.json -Depth 2
 
 $buildTimes | ConvertTo-Html -Title BuildTimes > ./times.html
 
