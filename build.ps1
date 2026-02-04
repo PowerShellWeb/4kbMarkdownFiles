@@ -46,7 +46,7 @@ if ($env:GITHUB_WORKFLOW) {
 
     npm install | Out-Host
 
-    $pagesRoot = Join-Path $PSScriptRoot "src/pages"
+    $pagesRoot = Join-Path $astroDevRoot "src/pages"
     if (-not (Test-Path $pagesRoot)) {
         New-Item -ItemType Directory -Path $pagesRoot
     }
@@ -186,8 +186,8 @@ $history = @(try {
 $history += $buildTimes | 
     Select-Object Technique, Time, RelativeSpeed, DateTime
 
-# ConvertTo-Json -InputObject $history > ./history.json -Depth 2
+ConvertTo-Json -InputObject $history > ./history.json -Depth 2
 
-
+Remove-Item -Recurse -Force ./astrodev
 
 Pop-Location
