@@ -116,11 +116,9 @@ $history = @(try {
 $buildTimes | ConvertTo-Html -Title BuildTimes > ./times.html
 
 
-$descriptionMessage = foreach ($buildtime in $buildTime) {
-    [Web.HttpUtility]::HtmlAttributeEncode(
-        ($buildTime.Technique, $buildTime.Time -join ':')
-    )
-}
+$descriptionMessage = @(foreach ($buildtime in $buildTimes) {    
+    ($buildTime.Technique, $buildTime.Time -join ':')    
+}) -join [Environment]::NewLine
 
 @(
     "<html>"
@@ -133,7 +131,11 @@ $descriptionMessage = foreach ($buildtime in $buildTime) {
 
     "<meta name='og:title' content='4kb Markdown Files Benchmark' />"
     
-    "<meta name='og:description' content='4kb Markdown Files Benchmark.  The fastest framework is no framework.  $descriptionMessage' />"
+    "<meta name='og:description' content='
+4kb Markdown Files Benchmark. 
+The fastest framework is no framework.
+$([Web.HttpUtility]::HtmlAttributeEncode($descriptionMessage))
+' />"
 
     "<meta name='article:published_time' content='$($StartTime.ToString('s'))' />"
 
