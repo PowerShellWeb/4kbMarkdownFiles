@@ -4,15 +4,20 @@
 .DESCRIPTION
     Builds 4kb Markdown files N different ways, in order to test performance.
 .NOTES
-    In the interests of fair play, any prerequisities should be installed before builds are timed.
+    In the interests of fair play, any prerequisities should be installed before builds are timed.    
 #>
-param()
+param(
+[uri]
+$BuildTimeHistoryUrl = "https://4kb.powershellweb.com/history.json"
+)
 
+# Make sure we're in the right place.
 Push-Location $PSScriptRoot
 
 #region Install Prereqs
 if ($env:GITHUB_WORKFLOW) {
-    $null = sudo npm install -g '@11ty/eleventy'
+    # Install 11ty to reduce 11ty build time
+    $null = sudo npm install -g '@11ty/eleventy'    
 
     Install-Module MarkX -Force
 
@@ -41,6 +46,7 @@ $cpuSpeed =
 #endregion
 
 $mySelf = $MyInvocation.MyCommand.ScriptBlock
+$StartTime = [DateTime]::Now
 
 & {
     foreach ($file in Get-ChildItem -filter build.with.*.ps1) {
@@ -61,16 +67,33 @@ $buildTimes = $buildTimes | Sort-Object Time
 foreach ($buildTime in $buildTimes) {
     $relativeSpeed = $buildTime.Time.TotalMilliseconds / $buildTimes[-1].Time.TotalMilliseconds
     Add-Member NoteProperty -InputObject $buildTime -Name RelativeSpeed $relativeSpeed -Force
-} 
+    Add-Member NoteProperty -InputObject $buildTime -Name DateTime $StartTime -Force
+}
+
+$history = @(try {
+    Invoke-RestMethod -Uri $BuildTimeHistoryUrl -ErrorAction Ignore
+} catch {
+    $null    
+})
+
+$history += $buildTimes | 
+    Select-Object Technique, Time, RelativeSpeed, Date
+
+ConvertTo-Json -InputObject $history > ./history.json
 
 $buildTimes | ConvertTo-Html -Title BuildTimes > ./times.html
 
 @(
     "<html>"
+    
     "<head>"    
+    
     "<title>4kb Markdown Files</title>"
+    
     "<meta name='viewport' content='width=device-width, initial-scale=1, minimum-scale=1.0' />"
+
     "<style>"
+    
     "
     
     body { height: 100vh; max-width: 100vw; margin:0 } 
