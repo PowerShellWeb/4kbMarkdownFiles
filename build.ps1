@@ -89,14 +89,19 @@ $StartTime = [DateTime]::Now
 
 & {
     foreach ($file in Get-ChildItem -filter build.with.*.ps1) {
-        $techniqueName = $file.Name -replace '\.build\.with' -replace '\.ps1$'
-        $script = (Get-Command $file.FullName -CommandType ExternalScript).ScriptBlock
-        $time = Measure-Command { . $file.FullName } 
-        [PSCustomObject]@{
-            Technique = $techniqueName
-            Time = $time
-            Script = $script
+        try {
+            $techniqueName = $file.Name -replace '\.build\.with' -replace '\.ps1$'
+            $script = (Get-Command $file.FullName -CommandType ExternalScript).ScriptBlock
+            $time = Measure-Command { . $file.FullName } 
+            [PSCustomObject]@{
+                Technique = $techniqueName
+                Time = $time
+                Script = $script
+            }
+        } catch {
+            Write-Warning "$file encountered an error: $_"
         }
+        
     }
 } | Tee-Object -Variable buildTimes
 
@@ -238,5 +243,6 @@ Remove-Item -Recurse -Force ./astrodev
 
 Pop-Location
 
+# Set our last exit code to 0
 $LASTEXITCODE = 0
-
+exit 0
