@@ -8,7 +8,9 @@
 #>
 param(
 [uri]
-$BuildTimeHistoryUrl = "https://4kb.powershellweb.com/history.json"
+$BuildTimeHistoryUrl = "https://4kb.powershellweb.com/history.json",
+
+[string]$GitHubRepository = $env:GITHUB_REPOSITORY
 )
 
 # Make sure we're in the right place.
@@ -161,13 +163,15 @@ $([Web.HttpUtility]::HtmlAttributeEncode($descriptionMessage))
     "<h1>4kb Markdown Files Benchmark</h1>"
     "<h2>Time to build 4096 markdown files</h2>"    
     "<h3>Last built at $([DateTime]::UtcNow.ToString("s")) running @ $cpuSpeed Mhz</h3>"
-    "<h4><a href='https://github.com/PowerShellWeb/4kbMarkdownFiles/'><button>Github Repo</button></a></h4>"
-    
-    "<h4>"    
-    "[![Deploy](https://github.com/PowerShellWeb/4kbMarkdownFiles/actions/workflows/deploy.yml/badge.svg)](https://github.com/PowerShellWeb/4kbMarkdownFiles/actions/workflows/deploy.yml)" |
-        ConvertFrom-Markdown |
-        Select-Object -ExpandProperty Html
+    if ($GitHubRepository) {
+        "<h4><a href='https://github.com/$GitHubRepository/'><button>Github Repo</button></a></h4>"
+        
+        "<h4>"
+        "<a href='https://github.com/$GitHubRepository/actions/workflows/deploy.yml'>"
+            "<img src='https://github.com/$GitHubRepository/actions/workflows/deploy.yml/badge.svg'></img>"
+        "</a>"        
     "</h4>"
+    }
     
     # Make a really basic heatmap (yes, this is that easy)
     # We want the fastest item to be the most green, so start by getting its relative speed
