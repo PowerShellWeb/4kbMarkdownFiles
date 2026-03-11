@@ -223,6 +223,7 @@ foreach ($buildTime in $buildTimes) {
     Add-Member NoteProperty -InputObject $buildTime -Name Time "$($buildTime.Time)" -Force
 }
 
+<#
 $history = @(try {
     Invoke-RestMethod -Uri $BuildTimeHistoryUrl -ErrorAction Ignore
 } catch {}) -ne $null
@@ -230,8 +231,12 @@ $history = @(try {
 $history += $buildTimes | 
     Select-Object Technique, Time, RelativeSpeed, DateTime
 
-ConvertTo-Json -InputObject $history > ./history.json -Depth 2
+ConvertTo-Json -InputObject $history > ./history.json -Depth 4
+#>
 
 Remove-Item -Recurse -Force ./astrodev
 
 Pop-Location
+
+$LASTEXITCODE = 0
+
